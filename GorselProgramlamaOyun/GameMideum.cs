@@ -5,6 +5,14 @@ namespace GorselProgramlamaOyun
     public partial class GameMideum : Form
     {
         Random rnd = new Random();
+
+        const int BOARDSCALE = 6;
+        int TotalTime = 90;
+        int CountDownTime = 90;
+
+        int cardWidth = 70;
+        int cardHeight = 70;
+        int padding = 20;
         public GameMideum()
         {
             InitializeComponent();
@@ -14,23 +22,24 @@ namespace GorselProgramlamaOyun
             TimeTxt.Text = TotalTime.ToString();
             GameTimer.Start();
         }
-        const int BOARDSCALE = 6;
-        int TotalTime = 80;
-        int CountDownTime = 80;
-
-        bool IsGameOver = false;
-        bool CanSelect = true;
         
+
+        
+
+        bool CanSelect = true;
+        bool IsGameOver = false;
+
+
 
         int FindeableCardCount = BOARDSCALE * BOARDSCALE / 2;
         int FindedCardCount;
 
         string firstCardTag;
         string secondCardTag;
-        PictureBox FirstPicture;
-        PictureBox SecondPicture;
+        CardClass FirstCard;
+        CardClass SecondCard;
 
-        PictureBox[,] Board = new PictureBox[BOARDSCALE, BOARDSCALE];
+        CardClass[,] Board = new CardClass[BOARDSCALE, BOARDSCALE];
         List<CardClass> Cards = new List<CardClass>();
 
 
@@ -39,69 +48,58 @@ namespace GorselProgramlamaOyun
 
             for (int i = 0; i < BOARDSCALE * BOARDSCALE / 2; i++)
             {
-                CardClass newCard = new CardClass();
-                PictureBox newPic = new PictureBox();
+                CardClass newCard1 = new CardClass();
+                PictureBox newPic1 = new PictureBox();
+                CardClass newCard2 = new CardClass();
+                PictureBox newPic2 = new PictureBox();
 
-                newPic.Height = 50;
-                newPic.Width = 50;
-                newPic.BackColor = Color.LightGray;
-                newPic.SizeMode = PictureBoxSizeMode.StretchImage;
-                newPic.Click += Picture_Click;
-                newPic.Tag = i;
+                newPic1.Height = cardWidth;
+                newPic1.Width = cardHeight;
+                newPic1.BackColor = Color.LightGray;
+                newPic1.SizeMode = PictureBoxSizeMode.StretchImage;
+                newPic1.Tag = i;
+                newPic1.Image = Image.FromFile("pics/" + i + ".png");
+                newCard1.CardPicture(newPic1);
+                newCard1.ID = i;
 
-                newPic.Image = Image.FromFile("pics/" + i + ".png");
+
+                newPic2.Height = cardWidth;
+                newPic2.Width = cardHeight;
+                newPic2.BackColor = Color.LightGray;
+                newPic2.SizeMode = PictureBoxSizeMode.StretchImage;
+                newPic2.Tag = i;
+                newPic2.Image = Image.FromFile("pics/" + i + ".png");
+                newCard2.CardPicture(newPic2);
+                newCard2.ID = i;
 
 
-                newCard.CardPicture(newPic);
-                newCard.ID = i;
 
-                Cards.Add(newCard);
-                Cards.Add(newCard);
+                newCard2.Click += Card_Click;
+                newCard1.Click += Card_Click;
+                Cards.Add(newCard1);
+                Cards.Add(newCard2);
 
             }
         }
-
         public void LoadBoard()
         {
-            int cardWidth = 70;
-            int cardHeight = 70;
-            int padding = 20;
-
-            int screenWidth = this.ClientSize.Width;
-            int screenHeight = this.ClientSize.Height;
-
-            int boardWidth = (cardWidth + padding) * BOARDSCALE + padding;
-            int boardHeight = (cardHeight + padding) * BOARDSCALE + padding;
-
-
             for (int i = 0; i < BOARDSCALE; i++)
             {
                 for (int j = 0; j < BOARDSCALE; j++)
                 {
+
                     int randomCardID = rnd.Next(Cards.Count);
-                    CardClass newCard = Cards[randomCardID];
+                    Board[i, j] = Cards[randomCardID];
                     Cards.RemoveAt(randomCardID);
 
-                    PictureBox newPic = new PictureBox();
-                    newPic.Height = cardHeight;
-                    newPic.Width = cardWidth;
-                    newPic.BackColor = Color.LightGray;
-                    newPic.SizeMode = PictureBoxSizeMode.StretchImage;
-                    newPic.Click += Picture_Click;
-                    newPic.Tag = newCard.ID;
-                    newPic.Image = Image.FromFile("pics/" + newCard.ID + ".png");
-
-                    newCard.CardPicture(newPic);
-                    newCard.pictureBox.Left = j * (cardWidth + padding) + padding;
-                    newCard.pictureBox.Top = i * (cardHeight + padding) + padding;
-
-                    Board[i, j] = newPic;
-                    this.Controls.Add(newCard.pictureBox);
+                    Board[i, j].pictureBox.Left = j * (cardWidth + padding) + padding;
+                    Board[i, j].pictureBox.Top = i * (cardHeight + padding) + padding;
+                    this.Controls.Add(Board[i, j].pictureBox);
                 }
             }
         }
 
-        private void Picture_Click(object? sender, EventArgs e)
+        private void Card_Click(object? sender, EventArgs e)
         {
             if (CanSelect)
             {
@@ -111,96 +109,56 @@ namespace GorselProgramlamaOyun
                 }
                 if (firstCardTag == null)
                 {
-                    FirstPicture = sender as PictureBox;
-                    if (FirstPicture.Tag != null)
+                    FirstCard = sender as CardClass;
+                    if (FirstCard.pictureBox.Tag != null)
                     {
-                        //MessageBox.Show("Picture Tag is Not Null");
-                        if (FirstPicture.Image == null)
+                        if (FirstCard.pictureBox.Image == null)
                         {
-                            FirstPicture.Image = Image.FromFile("pics/" + FirstPicture.Tag + ".png");
-                            firstCardTag = FirstPicture.Tag.ToString();
-                            //MessageBox.Show("Picture Image is Not Null");
+                            FirstCard.ShowCard();
+                            firstCardTag = FirstCard.pictureBox.Tag.ToString();
                         }
-                        else
-                        {
-                            // MessageBox.Show("Picture Image is Null");
-                        }
-
-                    }
-                    else
-                    {
-                        //MessageBox.Show("Picture Tag is Null");
                     }
                 }
                 else if (secondCardTag == null)
                 {
-                    SecondPicture = sender as PictureBox;
+                    SecondCard = sender as CardClass;
 
-                    if (SecondPicture.Tag != null)
+                    if (SecondCard.pictureBox.Tag != null)
                     {
-                        //MessageBox.Show("Picture Tag is Not Null");
-                        if (SecondPicture.Image == null)
+                        if (SecondCard.pictureBox.Image == null)
                         {
-                            SecondPicture.Image = Image.FromFile("pics/" + SecondPicture.Tag + ".png");
-                            secondCardTag = SecondPicture.Tag.ToString();
-                            //MessageBox.Show("Picture Image is Not Null");
+                            SecondCard.ShowCard();
+                            secondCardTag = SecondCard.pictureBox.Tag.ToString();
                         }
-                        else
-                        {
-                            // MessageBox.Show("Picture Image is Null");
-                        }
-
-                    }
-                    else
-                    {
-                        //MessageBox.Show("Picture Tag is Null");
                     }
                 }
                 else
                 {
-                    CheckPictures(FirstPicture, SecondPicture);
+                    CheckPictures(FirstCard.pictureBox, SecondCard.pictureBox);
                 }
             }
-
-
         }
         public void CheckPictures(PictureBox A, PictureBox B)
         {
 
             if (firstCardTag == secondCardTag)
             {
-                Board = new PictureBox[0, 0];
                 FindedCardCount++;
+                if (FindedCardCount >= FindeableCardCount)
+                {
+                    Win();
+                }
                 A.Enabled = false;
                 B.Enabled = false;
-                if (FindedCardCount == FindeableCardCount)
-                {
-                    GameTimer.Stop();
-                    GameTimer.Enabled = false;
-                    CanSelect = false;
-                    Win();
-
-                }
             }
             else
             {
-                FirstPicture.Image = null;
-                SecondPicture.Image = null;
+                FirstCard.UnvisibleCard();
+                SecondCard.UnvisibleCard();
             }
-
-
-
             firstCardTag = null;
             secondCardTag = null;
 
-        }
-
-        public void DoInvisibleAllCards()
-        {
-            foreach (var card in Cards)
-            {
-                card.UnvisibleCard();
-            }
         }
         public void Win()
         {

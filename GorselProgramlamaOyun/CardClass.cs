@@ -13,6 +13,17 @@ namespace GorselProgramlamaOyun
         public PictureBox pictureBox;
         public Image pictureImage;
         public bool IsFinded = false;
+        public event EventHandler Click;
+
+        private void Card_Click(object sender, EventArgs e)
+        {
+            OnClick(EventArgs.Empty);
+        }
+
+        protected virtual void OnClick(EventArgs e)
+        {
+            Click?.Invoke(this, e);
+        }
         public void ShowCard()
         {
             if (pictureBox != null)
@@ -31,7 +42,8 @@ namespace GorselProgramlamaOyun
         public void CardPicture(PictureBox newPictureBox)
         {
             this.pictureBox = newPictureBox;
-            pictureImage = pictureBox.Image ;
+            pictureImage = pictureBox.Image;
+            pictureBox.Click += Card_Click;
             pictureBox.Image = null;
         }
         
