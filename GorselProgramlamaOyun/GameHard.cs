@@ -57,22 +57,22 @@ namespace GorselProgramlamaOyun
                 CardClass newCard2 = new CardClass();
                 PictureBox newPic2 = new PictureBox();
 
+                newPic1.Image = Image.FromFile("../../../pics/" + i + ".png");
                 newPic1.Height = cardWidth;
                 newPic1.Width = cardHeight;
                 newPic1.BackColor = Color.LightGray;
                 newPic1.SizeMode = PictureBoxSizeMode.StretchImage;
                 newPic1.Tag = i;
-                newPic1.Image = Image.FromFile("pics/" + i + ".png");
                 newCard1.CardPicture(newPic1);
                 newCard1.ID = i;
 
 
+                newPic2.Image = Image.FromFile("../../../pics/" + i + ".png");
                 newPic2.Height = cardWidth;
                 newPic2.Width = cardHeight;
                 newPic2.BackColor = Color.LightGray;
                 newPic2.SizeMode = PictureBoxSizeMode.StretchImage;
                 newPic2.Tag = i;
-                newPic2.Image = Image.FromFile("pics/" + i + ".png");
                 newCard2.CardPicture(newPic2);
                 newCard2.ID = i;
 
